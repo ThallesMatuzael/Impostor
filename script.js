@@ -1,5 +1,5 @@
 // -------------------------------
-// Temas e palavras
+// Temas e Palavras
 // -------------------------------
 const temasEPalavras = {
     "Comidas": [
@@ -37,53 +37,81 @@ const temasEPalavras = {
 };
 
 
-// -------------------------------
-// Variáveis principais
-// -------------------------------
+// ----------------------------------------
+// Variáveis de Jogo
+// ----------------------------------------
 let jogadores = 0;
+let listaJogadores = [];
 let impostor = 0;
 let palavraEscolhida = "";
 let temaSelecionado = "";
-let jogadorAtual = 1;
+let jogadorAtual = 0;
 let votos = {};
 
 
-// -------------------------------
-// Inicialização do menu
-// -------------------------------
+// ----------------------------------------
+// Preencher combos
+// ----------------------------------------
 const temaSelect = document.getElementById("temaSelect");
 Object.keys(temasEPalavras).forEach(tema => {
-    const op = document.createElement("option");
+    let op = document.createElement("option");
     op.value = tema;
     op.textContent = tema;
     temaSelect.appendChild(op);
 });
 
 
-// -------------------------------
-// Navegação entre telas
-// -------------------------------
-function mostrar(tela) {
-    document.querySelectorAll(".container").forEach(div => div.classList.add("hidden"));
-    document.getElementById(tela).classList.remove("hidden");
+// ----------------------------------------
+// Troca de Telas
+// ----------------------------------------
+function mostrar(id) {
+    document.querySelectorAll(".container").forEach(t => t.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
 }
 
 
-// -------------------------------
-// Início do jogo
-// -------------------------------
-function iniciarJogo() {
+// ----------------------------------------
+// Tela de Nomes
+// ----------------------------------------
+function irParaNomes() {
     jogadores = Number(document.getElementById("qtdJogadores").value);
     temaSelecionado = temaSelect.value;
 
-    palavraEscolhida = pegarPalavraAleatoria(temaSelecionado);
-    impostor = Math.floor(Math.random() * jogadores) + 1;
+    const lista = document.getElementById("listaNomes");
+    lista.innerHTML = "";
 
-    jogadorAtual = 1;
+    listaJogadores = [];
+
+    for (let i = 1; i <= jogadores; i++) {
+        const input = document.createElement("input");
+        input.placeholder = `Nome do Jogador ${i}`;
+        input.id = `jogador${i}`;
+        lista.appendChild(input);
+    }
+
+    mostrar("telaNomes");
+}
+
+
+// ----------------------------------------
+// Iniciar Jogo
+// ----------------------------------------
+function iniciarJogo() {
+    listaJogadores = [];
+
+    for (let i = 1; i <= jogadores; i++) {
+        const nome = document.getElementById(`jogador${i}`).value.trim();
+        listaJogadores.push(nome || `Jogador ${i}`);
+    }
+
+    palavraEscolhida = pegarPalavraAleatoria(temaSelecionado);
+    impostor = Math.floor(Math.random() * jogadores);
+
+    jogadorAtual = 0;
     votos = {};
 
-    mostrar("telaPalavra");
     atualizarPalavra();
+    mostrar("telaPalavra");
 }
 
 function pegarPalavraAleatoria(tema) {
@@ -92,24 +120,25 @@ function pegarPalavraAleatoria(tema) {
 }
 
 
-// -------------------------------
-// Exibição das palavras
-// -------------------------------
+// ----------------------------------------
+// Palavra / Imposição
+// ----------------------------------------
 function atualizarPalavra() {
-    const texto = document.getElementById("textoPalavra");
+    document.getElementById("textoJogador").textContent =
+        `Agora é: ${listaJogadores[jogadorAtual]}`;
 
     if (jogadorAtual === impostor) {
-        texto.textContent = "Você é o IMPOSTOR!";
+        document.getElementById("textoPalavra").textContent = "VOCÊ É O IMPOSTOR!";
     } else {
-        texto.textContent = palavraEscolhida;
+        document.getElementById("textoPalavra").textContent = palavraEscolhida;
     }
 }
 
 function proximoJogador() {
     jogadorAtual++;
 
-    if (jogadorAtual > jogadores) {
-        montarTelaVotacao();
+    if (jogadorAtual >= jogadores) {
+        montarVotacao();
         mostrar("telaVotacao");
         return;
     }
@@ -118,58 +147,55 @@ function proximoJogador() {
 }
 
 
-// -------------------------------
+// ----------------------------------------
 // Votação
-// -------------------------------
-function montarTelaVotacao() {
-    const div = document.getElementById("votacaoArea");
-    div.innerHTML = "";
+// ----------------------------------------
+function montarVotacao() {
+    const area = document.getElementById("votacaoArea");
+    area.innerHTML = "";
 
-    for (let i = 1; i <= jogadores; i++) {
+    for (let i = 0; i < jogadores; i++) {
         const btn = document.createElement("button");
-        btn.textContent = `Jogador ${i}`;
-        btn.onclick = () => registrarVoto(i, btn);
-        div.appendChild(btn);
+        btn.textContent = listaJogadores[i];
+
+        btn.onclick = () => {
+            if (votos[i]) return;
+            votos[i] = true;
+
+            btn.style.background = "#4CAF50";
+            btn.style.pointerEvents = "none";
+        };
+
+        area.appendChild(btn);
     }
-}
-
-function registrarVoto(jogador, botao) {
-    if (votos[jogador]) return;
-
-    votos[jogador] = true;
-    botao.style.background = "#4CAF50";
-    botao.style.pointerEvents = "none";
 }
 
 function finalizarVotacao() {
-    let maisVotado = null;
-    let maiorQtde = 0;
-
     const contagem = {};
 
-    for (let j in votos) {
-        contagem[j] = (contagem[j] || 0) + 1;
-        if (contagem[j] > maiorQtde) {
-            maiorQtde = contagem[j];
-            maisVotado = j;
-        }
-    }
+    Object.keys(votos).forEach(v => {
+        contagem[v] = (contagem[v] || 0) + 1;
+    });
 
-    const texto = document.getElementById("resultadoTexto");
+    let maisVotado = Object.keys(contagem).sort((a, b) => contagem[b] - contagem[a])[0];
+
+    const resultado = document.getElementById("resultadoTexto");
 
     if (Number(maisVotado) === impostor) {
-        texto.textContent = `O impostor era o Jogador ${impostor}. Vocês venceram!`;
+        resultado.textContent =
+            `${listaJogadores[impostor]} era o IMPÓSTOR! Vocês venceram!`;
     } else {
-        texto.textContent = `O impostor era o Jogador ${impostor}. Ele enganou todo mundo.`;
+        resultado.textContent =
+            `${listaJogadores[impostor]} era o IMPOSTOR... e enganou todo mundo!`;
     }
 
     mostrar("telaResultado");
 }
 
 
-// -------------------------------
-// Reinício
-// -------------------------------
+// ----------------------------------------
+// Reiniciar
+// ----------------------------------------
 function reiniciarJogo() {
     mostrar("telaInicio");
 }
