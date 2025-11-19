@@ -50,9 +50,10 @@ let votos = {};
 
 
 // ----------------------------------------
-// Preencher combos
+// Preencher temaSelect
 // ----------------------------------------
 const temaSelect = document.getElementById("temaSelect");
+
 Object.keys(temasEPalavras).forEach(tema => {
     let op = document.createElement("option");
     op.value = tema;
@@ -60,9 +61,12 @@ Object.keys(temasEPalavras).forEach(tema => {
     temaSelect.appendChild(op);
 });
 
+// deixa o primeiro tema selecionado automaticamente
+temaSelect.selectedIndex = 0;
+
 
 // ----------------------------------------
-// Troca de Telas
+// Sistema de Troca de Telas
 // ----------------------------------------
 function mostrar(id) {
     document.querySelectorAll(".container").forEach(t => t.classList.add("hidden"));
@@ -71,15 +75,24 @@ function mostrar(id) {
 
 
 // ----------------------------------------
-// Tela de Nomes
+// Tela 2 — Inserção de Nomes
 // ----------------------------------------
 function irParaNomes() {
     jogadores = Number(document.getElementById("qtdJogadores").value);
     temaSelecionado = temaSelect.value;
 
+    if (!temaSelecionado) {
+        alert("Escolha um tema antes de continuar!");
+        return;
+    }
+
+    if (jogadores < 3) {
+        alert("Coloque pelo menos 3 jogadores pra brincadeira render.");
+        return;
+    }
+
     const lista = document.getElementById("listaNomes");
     lista.innerHTML = "";
-
     listaJogadores = [];
 
     for (let i = 1; i <= jogadores; i++) {
@@ -94,7 +107,7 @@ function irParaNomes() {
 
 
 // ----------------------------------------
-// Iniciar Jogo
+// Iniciar o Jogo
 // ----------------------------------------
 function iniciarJogo() {
     listaJogadores = [];
@@ -121,7 +134,7 @@ function pegarPalavraAleatoria(tema) {
 
 
 // ----------------------------------------
-// Palavra / Imposição
+// Mostrar palavra / impostor
 // ----------------------------------------
 function atualizarPalavra() {
     document.getElementById("textoJogador").textContent =
@@ -159,8 +172,13 @@ function montarVotacao() {
         btn.textContent = listaJogadores[i];
 
         btn.onclick = () => {
-            if (votos[i]) return;
-            votos[i] = true;
+            if (votos["jaVotou"]) {
+                alert("Calma, jovem... só 1 voto por jogador.");
+                return;
+            }
+
+            votos["jaVotou"] = true; // cada pessoa só vota uma vez
+            votos[i] = (votos[i] || 0) + 1;
 
             btn.style.background = "#4CAF50";
             btn.style.pointerEvents = "none";
@@ -171,22 +189,25 @@ function montarVotacao() {
 }
 
 function finalizarVotacao() {
-    const contagem = {};
+    let vencedor = null;
+    let maior = 0;
 
-    Object.keys(votos).forEach(v => {
-        contagem[v] = (contagem[v] || 0) + 1;
-    });
-
-    let maisVotado = Object.keys(contagem).sort((a, b) => contagem[b] - contagem[a])[0];
+    for (let jogador in votos) {
+        if (jogador === "jaVotou") continue;
+        if (votos[jogador] > maior) {
+            maior = votos[jogador];
+            vencedor = Number(jogador);
+        }
+    }
 
     const resultado = document.getElementById("resultadoTexto");
 
-    if (Number(maisVotado) === impostor) {
+    if (vencedor === impostor) {
         resultado.textContent =
-            `${listaJogadores[impostor]} era o IMPÓSTOR! Vocês venceram!`;
+            `${listaJogadores[impostor]} era o IMPÓSTOR! Mandaram bem!`;
     } else {
         resultado.textContent =
-            `${listaJogadores[impostor]} era o IMPOSTOR... e enganou todo mundo!`;
+            `${listaJogadores[impostor]} era o IMPOSTOR... e enganou geral.`;
     }
 
     mostrar("telaResultado");
