@@ -1,10 +1,37 @@
 /* TEMAS */
-const temas = {
-  locais: ["Túnel", "Praia", "Shopping", "Escola", "Hospital", "Restaurante", "Estádio", "Biblioteca", "Aeroporto"],
-  objetos: ["Celular", "Chave", "Bola", "Livro", "Relógio", "Faca", "Cadeira", "Computador", "Copo"],
-  personagens: ["Mickey", "Goku", "Naruto", "Bob Esponja", "Homem-Aranha", "Scooby-Doo", "Pikachu", "Ben 10"],
-  profissoes: ["Médico", "Professor", "Engenheiro", "Advogado", "Piloto", "Bombeiro", "Padeiro", "Cantor", "Policial"],
-  animais: ["Cachorro", "Gato", "Elefante", "Tubarão", "Leão", "Macaco", "Coruja", "Cavalo", "Cobra"]
+const temasEPalavras = {
+    "Comidas": [
+        "Pizza", "Hambúrguer", "Coxinha", "Sushi", "Strogonoff",
+        "Lasanha", "Tapioca", "Açaí", "Feijoada", "Brigadeiro",
+        "Cuscuz", "Bolo de Cenoura", "Arroz Carreteiro", "Baião de Dois"
+    ],
+
+    "Animais": [
+        "Cachorro", "Gato", "Elefante", "Jacaré", "Lobo",
+        "Tartaruga", "Macaco", "Girafa", "Tubarão", "Falcão",
+        "Capivara", "Pavão", "Lhama", "Coala"
+    ],
+
+    "Objetos": [
+        "Cadeira", "Controle", "Chave", "Computador", "Garrafa",
+        "Lanterna", "Relógio", "Escova", "Fone de Ouvido", "Bicicleta",
+        "Lápis", "Carregador", "Ventilador", "Panela"
+    ],
+
+    "Lugares": [
+        "Praia", "Shopping", "Escola", "Igreja", "Cinema",
+        "Parque", "Farmácia", "Supermercado", "Aeroporto", "Estádio",
+        "Museu", "Zoológico", "Restaurante", "Hospital"
+    ],
+
+    "Famosos": [
+        "Oruam", "Vini Jr", "Virgínia Fonseca",
+        "Lula", "Bolsonaro", "Alexandre de Moraes",
+        "Neymar", "Anitta", "Gusttavo Lima",
+        "Whindersson Nunes", "Luísa Sonza", "Felipe Neto",
+        "Johnny Depp", "Zendaya", "The Rock",
+        "Taylor Swift", "Messi", "Cristiano Ronaldo"
+    ]
 };
 
 /* ESTADO CENTRAL */
@@ -150,3 +177,4 @@ function voltarMenu() {
   document.getElementById("nomes").value = "";
   trocarTela("resultado", "menu");
 }
+
