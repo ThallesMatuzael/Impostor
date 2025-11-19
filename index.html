@@ -3,376 +3,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ache o Impostor — Caos Mode</title>
-  <style>
-    :root{--bg1:#0d1117; --bg2:#1e293b; --card:#0b1220; --accent:#7c3aed; --ok:#22c55e; --danger:#ef4444}
-    *{box-sizing:border-box}
-    body{font-family:Inter, Poppins, system-ui, -apple-system, 'Segoe UI', Roboto; background:linear-gradient(135deg,var(--bg1),var(--bg2)); color:#fff; margin:0; min-height:100vh; display:flex;align-items:center;justify-content:center;padding:18px}
-    .app{width:100%;max-width:450px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(2,6,23,.7)}
-    h1{margin:6px 0 4px;font-size:20px}
-    p.lead{margin:0;color:#cbd5e1}
-    .card{background:var(--card);padding:12px;border-radius:12px;margin-top:12px}
-    label{display:block;margin-bottom:8px;color:#9ca3af}
-    input[type=number], textarea, select{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit}
-    textarea{min-height:88px}
-    .row{display:flex;gap:8px}
-    .btn{display:inline-block;padding:10px 12px;border-radius:10px;border:none;background:var(--accent);color:#041025;font-weight:700;cursor:pointer}
-    .btn.ghost{background:transparent;color:#cbd5e1;border:1px solid rgba(255,255,255,0.04)}
-    .screen{min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12px}
-    .big{font-size:22px;font-weight:800}
-    .muted{color:#9ca3af}
-    .wordCard{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;margin-top:10px;width:100%}
-    .word{font-size:28px;font-weight:800}
-    .impost{color:var(--danger)}
-    .trans{animation:fadeIn .36s ease both}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-    .pulse{animation:pulse 1.2s infinite}
-    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
-    .votacaoTela{background:linear-gradient(135deg,#3b0b0b,#5b1212)}
-    .transicaoTela{background:linear-gradient(135deg,#0b2b6b,#26204e)}
-    .modeToggle{display:flex;gap:8px;flex-direction:column;align-items:flex-start}
-    .small{font-size:13px;padding:8px}
-    .chip{padding:6px 8px;border-radius:999px;background:rgba(255,255,255,0.02)}
-  </style>
+  <title>Ache o Impostor</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>Ache o Impostor</h1>
-      <p class="lead">Modo caótico habilitável — sem sons, só charme visual.</p>
-    </header>
 
-    <div id="menuCard" class="card">
-      <label>Quantidade de jogadores</label>
-      <input type="number" id="qtd" min="3" max="15" value="5">
-      <label style="margin-top:10px">Nomes (um por linha)</label>
-      <textarea id="nomes" placeholder="Th
-Ana
-João"></textarea>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn" id="genBtn">Gerar nomes</button>
-        <button class="btn ghost" id="toThemes">Próximo: temas</button>
-      </div>
-    </div>
+  <!-- MENU -->
+  <div id="menu">
+    <h1>Ache o Impostor 👀</h1>
+    <label>Quantidade de jogadores:</label>
+    <input type="number" id="qtd" min="3" max="15" value="5" />
 
-    <div id="themeCard" class="card hidden">
-      <label>Escolha um tema</label>
-      <select id="temaEscolhido"></select>
-      <div style="margin-top:10px" class="modeToggle">
-        <label><input type="checkbox" id="modeDouble"> Ataque: dupla palavra</label>
-        <label><input type="checkbox" id="modePlot"> Plot Twist</label>
-        <small class="muted">Ative um ou ambos para mais caos.</small>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="btn" id="startBtn">Começar jogo</button>
-        <button class="btn ghost" id="backToMenu">Voltar</button>
-      </div>
-    </div>
+    <p>Insira os nomes (um por linha):</p>
+    <textarea id="nomes"></textarea>
 
-    <div id="gameCard" class="card hidden screen">
-      <div id="holderBox">
-        <div class="muted">Passe o celular para</div>
-        <div class="big" id="nomeAtual"></div>
-        <div class="wordCard trans" id="wordArea" style="display:none">
-          <div id="wordMsg" class="muted"></div>
-          <div class="word" id="wordText"></div>
-          <div id="extraText" class="muted" style="margin-top:8px;display:none"></div>
-        </div>
-        <div style="margin-top:12px;width:100%">
-          <button class="btn" id="confirmBtn">Mostrar palavra</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="transCard" class="card hidden screen">
-      <h2 class="big">Preparando votação</h2>
-      <p class="muted">Todas as palavras já foram vistas.</p>
-      <p class="muted" id="transHint"></p>
-      <div style="display:flex;gap:8px;margin-top:12px;justify-content:center">
-        <button class="btn" id="masterStart">Iniciar votação</button>
-        <button class="btn ghost" id="reviewWords">Revisar palavras (moderador)</button>
-      </div>
-    </div>
-
-    <div id="plotRevealCard" class="card hidden screen">
-      <h2 class="big">PLOT TWIST!</h2>
-      <p class="muted">Sua palavra mudou — passe o celular só pra você ver.</p>
-      <div class="wordCard" id="plotWordCard"><div id="plotWord" class="word"></div></div>
-      <div style="margin-top:12px"><button class="btn" id="plotOk">OK, devolver ao mestre</button></div>
-    </div>
-
-    <div id="votingCard" class="card hidden screen">
-      <div style="width:100%">
-        <div class="muted">Votando:</div>
-        <div class="big" id="voterName"></div>
-        <div style="margin-top:10px" id="votingOptions"></div>
-        <button class="btn ghost" id="undoVote" style="margin-top:12px;display:none;background:#ef4444">Desfazer último voto</button>
-      </div>
-    </div>
-
-    <div id="resultCard" class="card hidden screen">
-      <h2 class="big">Resultado</h2>
-      <p id="resultText" class="muted"></p>
-      <div style="display:flex;gap:8px;margin-top:12px;justify-content:center">
-        <button class="btn" id="playAgain">Jogar novamente</button>
-        <button class="btn ghost" id="toMenu">Voltar ao menu</button>
-      </div>
-    </div>
-
+    <button onclick="gerarNomes()">Gerar nomes automáticos</button>
+    <button onclick="selecionarTema()">Continuar ➡️</button>
   </div>
 
-<script>
-// temas
-const THEMES = {
-  locais:["Túnel","Praia","Shopping","Escola","Hospital","Restaurante","Estádio","Biblioteca","Aeroporto","Parque"],
-  objetos:["Celular","Chave","Bola","Livro","Relógio","Faca","Cadeira","Computador","Copo","Caneta"],
-  personagens:["Mickey","Goku","Naruto","Bob Esponja","Homem-Aranha","Scooby-Doo","Pikachu","Ben 10","Ash","Dora"],
-  profissoes:["Médico","Professor","Engenheiro","Advogado","Piloto","Bombeiro","Padeiro","Cantor","Policial","Programador"],
-  animais:["Cachorro","Gato","Elefante","Tubarão","Leão","Macaco","Coruja","Cavalo","Cobra","Panda"],
-  famosos:["Oruan","Luva de Pedreiro","Whindersson","Gkay","Alanzoka","Felipe Neto","Carlinhos Maia","Juliette","Nobru","Loud Coringa","Luba","Cellbit","Virginia","Rezende","Luísa Sonza","Neymar","Casimiro","MC Daniel","MC Ryan SP","Bielzin"]
-};
+  <!-- TEMA -->
+  <div id="temaSelecao" class="hidden">
+    <h2>Escolha um tema:</h2>
+    <select id="temaEscolhido">
+      <option value="locais">Locais</option>
+      <option value="objetos">Objetos</option>
+      <option value="personagens">Personagens de Desenho</option>
+      <option value="profissoes">Profissões</option>
+      <option value="animais">Animais</option>
+    </select>
+    <button onclick="iniciarJogo()">Começar jogo 🚀</button>
+  </div>
 
-// elementos
-const menuCard = document.getElementById('menuCard');
-const themeCard = document.getElementById('themeCard');
-const gameCard = document.getElementById('gameCard');
-const transCard = document.getElementById('transCard');
-const votingCard = document.getElementById('votingCard');
-const resultCard = document.getElementById('resultCard');
-const plotRevealCard = document.getElementById('plotRevealCard');
+  <!-- JOGO -->
+  <div id="jogo" class="hidden">
+    <h2 id="nomeAtual"></h2>
+    <p id="mensagem"></p>
+    <button onclick="confirmar()">Confirmar</button>
+  </div>
 
-const temaSelect = document.getElementById('temaEscolhido');
-const genBtn = document.getElementById('genBtn');
-const toThemes = document.getElementById('toThemes');
-const startBtn = document.getElementById('startBtn');
-const backToMenu = document.getElementById('backToMenu');
-const confirmBtn = document.getElementById('confirmBtn');
-const nomeAtualEl = document.getElementById('nomeAtual');
-const wordArea = document.getElementById('wordArea');
-const wordText = document.getElementById('wordText');
-const wordMsg = document.getElementById('wordMsg');
-const extraText = document.getElementById('extraText');
-const masterStart = document.getElementById('masterStart');
-const reviewWords = document.getElementById('reviewWords');
-const plotWord = document.getElementById('plotWord');
-const plotOk = document.getElementById('plotOk');
-const voterName = document.getElementById('voterName');
-const votingOptions = document.getElementById('votingOptions');
-const undoVoteBtn = document.getElementById('undoVote');
-const resultText = document.getElementById('resultText');
-const playAgain = document.getElementById('playAgain');
-const toMenu = document.getElementById('toMenu');
+  <!-- TRANSIÇÃO -->
+  <div id="transicao" class="hidden">
+    <h2>Todas as palavras foram reveladas!</h2>
+    <p>Agora o mestre deve iniciar a votação.</p>
+    <button onclick="iniciarVotacao()">Começar votação 🕵️‍♂️</button>
+  </div>
 
-// estado
-let players = []; // {name, word, extraWord|null, isImpostor}
-let tema = '';
-let modeDouble = false;
-let modePlot = false;
-let currentIndex = 0;
-let phase = 'name';
-let votes = {}; // map name->count
-let lastVote = null; // {voterIndex, targetName}
-let plotTarget = null;
+  <!-- VOTAÇÃO -->
+  <div id="votacao" class="hidden">
+    <h2 id="votador"></h2>
+    <p>Vote em quem você acha que é o impostor:</p>
+    <div id="opcoesVoto"></div>
+  </div>
 
-// preencher temas
-function populateThemes(){
-  temaSelect.innerHTML = '';
-  Object.keys(THEMES).forEach(k=>{
-    const opt = document.createElement('option'); opt.value=k; opt.textContent = k[0].toUpperCase()+k.slice(1);
-    temaSelect.appendChild(opt);
-  })
-}
-populateThemes();
+  <!-- RESULTADO -->
+  <div id="resultado" class="hidden">
+    <h2>Resultado 🕵️‍♂️</h2>
+    <p id="resultadoTexto"></p>
+    <button onclick="reiniciar()">Jogar novamente 🔁</button>
+    <button onclick="voltarMenu()">Voltar ao menu 🏠</button>
+  </div>
 
-// navegação
-genBtn.addEventListener('click', ()=>{
-  const n = parseInt(document.getElementById('qtd').value)||5;
-  const sample = ['Th','Alex','Kai','Luna','Iago','Maya','Rafa','Bia','Zé','Nina','Leo','Cauã'];
-  document.getElementById('nomes').value = sample.slice(0,n).join('
-');
-});
-
-toThemes.addEventListener('click', ()=>{ menuCard.classList.add('hidden'); themeCard.classList.remove('hidden'); });
-backToMenu.addEventListener('click', ()=>{ themeCard.classList.add('hidden'); menuCard.classList.remove('hidden'); });
-
-startBtn.addEventListener('click', ()=>{
-  const namesRaw = document.getElementById('nomes').value.split('
-').map(s=>s.trim()).filter(Boolean);
-  if(namesRaw.length < 3) return alert('Pelo menos 3 jogadores');
-  players = namesRaw.map(n=>({name:n, word:null, extraWord:null, isImpostor:false}));
-  tema = temaSelect.value;
-  modeDouble = document.getElementById('modeDouble').checked;
-  modePlot = document.getElementById('modePlot').checked;
-
-  // escolher palavra base
-  const pool = [...THEMES[tema]];
-  const chosen = pool[Math.floor(Math.random()*pool.length)];
-
-  // escolher impostor
-  const imp = Math.floor(Math.random()*players.length);
-  players.forEach((p,i)=>{ p.isImpostor = (i===imp); p.word = p.isImpostor ? 'IMPOSTOR' : chosen });
-
-  // modo dupla palavra: escolhe um jogador aleatório (não impostor ideally)
-  if(modeDouble){
-    let idx = Math.floor(Math.random()*players.length);
-    // prefer não impostor
-    if(players[idx].isImpostor){ idx = (idx+1)%players.length; }
-    players[idx].extraWord = pool.filter(w=>w!==chosen)[Math.floor(Math.random()*(pool.length-1))] || pool[0];
-    players[idx].hasDouble = true;
-  }
-
-  // plot twist: escolher target (pode ser qualquer um)
-  if(modePlot){
-    plotTarget = Math.floor(Math.random()*players.length);
-    // ensure not same as impostor? allow it — more chaos
-  } else plotTarget = null;
-
-  currentIndex = 0; phase='name';
-  themeCard.classList.add('hidden'); gameCard.classList.remove('hidden'); document.body.className='';
-  showHolder();
-});
-
-function showHolder(){
-  const p = players[currentIndex];
-  nomeAtualEl.textContent = p.name;
-  wordArea.style.display='none';
-  confirmBtn.textContent = 'Mostrar palavra';
-}
-
-confirmBtn.addEventListener('click', ()=>{
-  const p = players[currentIndex];
-  if(phase==='name'){
-    // reveal
-    phase='word';
-    nomeAtualEl.textContent = p.name;
-    wordArea.style.display='block';
-    if(p.isImpostor){ wordMsg.textContent='Você é o IMPOSTOR! 🤫'; wordText.textContent='IMPOSTOR'; wordText.classList.add('impost'); extraText.style.display='none'; }
-    else {
-      wordMsg.textContent='Palavra:'; wordText.classList.remove('impost'); wordText.textContent=p.word; if(p.hasDouble){ extraText.style.display='block'; extraText.textContent='(ATAQUE: você também tem outra palavra)
-'+p.extraWord; } else extraText.style.display='none';
-    }
-    confirmBtn.textContent='Confirmar leitura';
-  } else {
-    // next
-    phase='name'; currentIndex++;
-    if(currentIndex >= players.length){
-      // end of round
-      gameCard.classList.add('hidden'); transCard.classList.remove('hidden');
-      document.body.className='transicaoTela';
-      // hint text depending modes
-      document.getElementById('transHint').textContent = (modeDouble||modePlot) ? 'Modos caóticos ativos — o mestre pode prosseguir quando estiver pronto.' : 'Passe ao mestre iniciar a votação.';
-    } else {
-      showHolder();
-    }
-  }
-});
-
-// master starts voting - but if plot enabled, reveal new word to target first
-masterStart.addEventListener('click', ()=>{
-  transCard.classList.add('hidden');
-  if(modePlot && plotTarget !== null){
-    // pick a different word than current
-    const pool = THEMES[tema].filter(w=>w !== players[plotTarget].word);
-    const newW = pool[Math.floor(Math.random()*pool.length)];
-    players[plotTarget].word = newW; // change only for them
-    // show reveal card to that player
-    plotWord.textContent = newW;
-    plotRevealCard.classList.remove('hidden');
-    document.body.className='transicaoTela';
-  } else startVoting();
-});
-
-plotOk.addEventListener('click', ()=>{
-  plotRevealCard.classList.add('hidden');
-  startVoting();
-});
-
-function startVoting(){
-  // show voting screen with different background
-  document.body.className='votacaoTela';
-  votingCard.classList.remove('hidden'); transCard.classList.add('hidden');
-  currentIndex = 0; votes = {}; lastVote = null; undoVoteBtn.style.display='none';
-  showVoter();
-}
-
-function showVoter(){
-  const voter = players[currentIndex];
-  voterName.textContent = voter.name;
-  votingOptions.innerHTML = '';
-  players.forEach((p,i)=>{
-    if(p.name !== voter.name){
-      const b = document.createElement('button'); b.className='btn ghost'; b.style.margin='6px'; b.textContent=p.name; b.onclick = ()=>castVote(i);
-      votingOptions.appendChild(b);
-    }
-  });
-}
-
-function castVote(targetIndex){
-  const targetName = players[targetIndex].name;
-  votes[targetName] = (votes[targetName]||0) + 1;
-  lastVote = {voterIndex: currentIndex, targetName};
-  undoVoteBtn.style.display='inline-block';
-  currentIndex++;
-  if(currentIndex >= players.length){
-    // done voting
-    votingCard.classList.add('hidden'); showResult();
-  } else showVoter();
-}
-
-undoVoteBtn.addEventListener('click', ()=>{
-  if(!lastVote) return;
-  // remove the last vote and step back
-  const tgt = lastVote.targetName;
-  votes[tgt] = (votes[tgt]||0) - 1;
-  if(votes[tgt] <= 0) delete votes[tgt];
-  currentIndex = lastVote.voterIndex;
-  lastVote = null;
-  undoVoteBtn.style.display='none';
-  // show voter again
-  votingCard.classList.remove('hidden'); showVoter();
-});
-
-function showResult(){
-  document.body.className=''; resultCard.classList.remove('hidden');
-  // find most voted
-  let winner = null; let max = -1;
-  Object.keys(votes).forEach(k=>{ if(votes[k] > max){ max = votes[k]; winner = k; } });
-  if(!winner){ resultText.textContent = 'Ninguém recebeu votos.'; }
-  else {
-    const impostorName = players.find(p=>p.isImpostor).name;
-    const ok = (winner === impostorName);
-    resultText.textContent = `Mais votado: ${winner} (${max} voto(s)).
-${ ok ? 'O grupo venceu! 🎉' : `O impostor (${impostorName}) venceu! 😈`}`;
-  }
-}
-
-playAgain.addEventListener('click', ()=>{
-  // reset but keep same names and modes - reshuffle
-  resultCard.classList.add('hidden');
-  // reset players but keep names
-  const names = players.map(p=>p.name);
-  players = names.map(n=>({name:n,word:null,extraWord:null,isImpostor:false}));
-  // go back to theme selection
-  gameCard.classList.add('hidden');
-  themeCard.classList.remove('hidden');
-});
-
-toMenu.addEventListener('click', ()=>{ resultCard.classList.add('hidden'); themeCard.classList.add('hidden'); menuCard.classList.remove('hidden'); });
-
-reviewWords.addEventListener('click', ()=>{
-  // moderator can review per-player words quickly
-  transCard.classList.add('hidden');
-  // show a quick overlay cycle
-  let i=0; const overlay = document.createElement('div'); overlay.style.position='fixed'; overlay.style.inset='0'; overlay.style.background='rgba(0,0,0,0.75)'; overlay.style.display='flex'; overlay.style.alignItems='center'; overlay.style.justifyContent='center'; overlay.style.zIndex='9999';
-  const box = document.createElement('div'); box.style.background='#071024'; box.style.padding='18px'; box.style.borderRadius='12px'; box.style.textAlign='center'; box.style.width='90%';
-  const nameEl = document.createElement('div'); nameEl.style.fontSize='20px'; nameEl.style.fontWeight='800'; nameEl.style.marginBottom='8px';
-  const wEl = document.createElement('div'); wEl.style.color='#9ca3af';
-  const nextB = document.createElement('button'); nextB.className='btn'; nextB.textContent='Próximo'; nextB.onclick = ()=>{ i++; if(i>=players.length){ document.body.removeChild(overlay); transCard.classList.remove('hidden'); } else show(); };
-  box.appendChild(nameEl); box.appendChild(wEl); box.appendChild(nextB); overlay.appendChild(box); document.body.appendChild(overlay);
-  function show(){ const p=players[i]; nameEl.textContent = p.name; wEl.textContent = p.isImpostor ? 'IMPOSTOR' : (p.word + (p.hasDouble ? (' / ' + p.extraWord) : '')); }
-  show();
-});
-
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
