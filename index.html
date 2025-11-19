@@ -7,6 +7,7 @@
 </head>
 <body>
 
+<!-- TELA 1 — CONFIGURAÇÃO INICIAL -->
 <div class="container" id="telaInicio">
     <h1 class="titulo">Jogo do Impossível</h1>
 
@@ -17,22 +18,35 @@
         <label>Tema:</label>
         <select id="temaSelect"></select>
 
-        <button onclick="iniciarJogo()">Iniciar</button>
+        <button onclick="irParaNomes()">Continuar</button>
     </div>
 </div>
 
 
+<!-- TELA 2 — NOMES -->
+<div class="container hidden" id="telaNomes">
+    <h2 class="titulo">Jogadores</h2>
+
+    <div id="listaNomes" class="card"></div>
+
+    <button onclick="iniciarJogo()">Iniciar Jogo</button>
+</div>
+
+
+<!-- TELA 3 — PALAVRA -->
 <div class="container hidden" id="telaPalavra">
     <h2 class="titulo">Sua Palavra</h2>
 
     <div class="card palavra-card">
         <p id="textoPalavra"></p>
+        <p id="textoJogador"></p>
     </div>
 
     <button onclick="proximoJogador()">Próximo</button>
 </div>
 
 
+<!-- TELA 4 — VOTAÇÃO -->
 <div class="container hidden" id="telaVotacao">
     <h2 class="titulo">Votação</h2>
 
@@ -42,6 +56,7 @@
 </div>
 
 
+<!-- TELA 5 — RESULTADO -->
 <div class="container hidden" id="telaResultado">
     <h2 class="titulo">Resultado</h2>
 
