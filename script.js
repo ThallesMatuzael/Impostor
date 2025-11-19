@@ -1,4 +1,6 @@
-/* TEMAS */
+// -------------------------------
+// Temas e palavras
+// -------------------------------
 const temasEPalavras = {
     "Comidas": [
         "Pizza", "Hambúrguer", "Coxinha", "Sushi", "Strogonoff",
@@ -34,147 +36,140 @@ const temasEPalavras = {
     ]
 };
 
-/* ESTADO CENTRAL */
-const estado = {
-  jogadores: [],
-  palavra: "",
-  impostor: "",
-  indice: 0,
-  fase: "nome",
-  votos: {},
-  tema: ""
-};
 
-/* TROCAR TELAS */
-function trocarTela(atual, proxima, fundo = "") {
-  document.body.className = fundo;
-  document.getElementById(atual).classList.add("hidden");
-  document.getElementById(proxima).classList.remove("hidden");
+// -------------------------------
+// Variáveis principais
+// -------------------------------
+let jogadores = 0;
+let impostor = 0;
+let palavraEscolhida = "";
+let temaSelecionado = "";
+let jogadorAtual = 1;
+let votos = {};
+
+
+// -------------------------------
+// Inicialização do menu
+// -------------------------------
+const temaSelect = document.getElementById("temaSelect");
+Object.keys(temasEPalavras).forEach(tema => {
+    const op = document.createElement("option");
+    op.value = tema;
+    op.textContent = tema;
+    temaSelect.appendChild(op);
+});
+
+
+// -------------------------------
+// Navegação entre telas
+// -------------------------------
+function mostrar(tela) {
+    document.querySelectorAll(".container").forEach(div => div.classList.add("hidden"));
+    document.getElementById(tela).classList.remove("hidden");
 }
 
-/* NOMES AUTO */
-function gerarNomes() {
-  const qtd = parseInt(document.getElementById("qtd").value);
-  document.getElementById("nomes").value =
-    Array.from({ length: qtd }, (_, i) => `Jogador ${i + 1}`).join("\n");
-}
 
-/* COLETAR JOGADORES */
-function selecionarTema() {
-  const lista = document.getElementById("nomes").value.trim();
-  if (!lista) return alert("Digite ou gere os nomes!");
-
-  estado.jogadores = lista.split("\n").map(n => n.trim());
-  trocarTela("menu", "temaSelecao");
-}
-
-/* COMEÇAR JOGO */
+// -------------------------------
+// Início do jogo
+// -------------------------------
 function iniciarJogo() {
-  estado.tema = document.getElementById("temaEscolhido").value;
-  const palavras = temas[estado.tema];
+    jogadores = Number(document.getElementById("qtdJogadores").value);
+    temaSelecionado = temaSelect.value;
 
-  estado.palavra = palavras[Math.floor(Math.random() * palavras.length)];
-  estado.impostor = estado.jogadores[Math.floor(Math.random() * estado.jogadores.length)];
-  estado.indice = 0;
-  estado.fase = "nome";
+    palavraEscolhida = pegarPalavraAleatoria(temaSelecionado);
+    impostor = Math.floor(Math.random() * jogadores) + 1;
 
-  trocarTela("temaSelecao", "jogo");
-  atualizarJogo();
+    jogadorAtual = 1;
+    votos = {};
+
+    mostrar("telaPalavra");
+    atualizarPalavra();
 }
 
-/* MOSTRAR INFO */
-function atualizarJogo() {
-  const nome = estado.jogadores[estado.indice];
-  document.getElementById("nomeAtual").textContent = nome;
-
-  if (estado.fase === "nome") {
-    document.getElementById("mensagem").textContent = `Passe o celular para ${nome}`;
-  } else {
-    document.getElementById("mensagem").textContent =
-      nome === estado.impostor ? "Você é o IMPOSTOR! 🤫" : "Palavra: " + estado.palavra;
-  }
+function pegarPalavraAleatoria(tema) {
+    const lista = temasEPalavras[tema];
+    return lista[Math.floor(Math.random() * lista.length)];
 }
 
-/* CONFIRMAR */
-function confirmar() {
-  if (estado.fase === "nome") {
-    estado.fase = "palavra";
-  } else {
-    estado.indice++;
-    estado.fase = "nome";
 
-    if (estado.indice >= estado.jogadores.length) {
-      trocarTela("jogo", "transicao", "transicaoTela");
-      return;
-    }
-  }
-  atualizarJogo();
-}
+// -------------------------------
+// Exibição das palavras
+// -------------------------------
+function atualizarPalavra() {
+    const texto = document.getElementById("textoPalavra");
 
-/* VOTAÇÃO */
-function iniciarVotacao() {
-  estado.votos = {};
-  estado.indice = 0;
-
-  trocarTela("transicao", "votacao", "votacaoTela");
-  mostrarVotador();
-}
-
-function mostrarVotador() {
-  const nome = estado.jogadores[estado.indice];
-  document.getElementById("votador").textContent = `${nome}, é a sua vez!`;
-
-  const opcoes = document.getElementById("opcoesVoto");
-  opcoes.innerHTML = "";
-
-  estado.jogadores.forEach(j => {
-    const btn = document.createElement("button");
-    btn.textContent = j;
-
-    if (j === nome) {
-      btn.classList.add("disabled");
+    if (jogadorAtual === impostor) {
+        texto.textContent = "Você é o IMPOSTOR!";
     } else {
-      btn.onclick = () => votar(j);
+        texto.textContent = palavraEscolhida;
+    }
+}
+
+function proximoJogador() {
+    jogadorAtual++;
+
+    if (jogadorAtual > jogadores) {
+        montarTelaVotacao();
+        mostrar("telaVotacao");
+        return;
     }
 
-    opcoes.appendChild(btn);
-  });
+    atualizarPalavra();
 }
 
-function votar(alvo) {
-  estado.votos[alvo] = (estado.votos[alvo] || 0) + 1;
 
-  estado.indice++;
-  if (estado.indice >= estado.jogadores.length) {
-    mostrarResultado();
-  } else {
-    mostrarVotador();
-  }
+// -------------------------------
+// Votação
+// -------------------------------
+function montarTelaVotacao() {
+    const div = document.getElementById("votacaoArea");
+    div.innerHTML = "";
+
+    for (let i = 1; i <= jogadores; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = `Jogador ${i}`;
+        btn.onclick = () => registrarVoto(i, btn);
+        div.appendChild(btn);
+    }
 }
 
-/* RESULTADO */
-function mostrarResultado() {
-  trocarTela("votacao", "resultado");
+function registrarVoto(jogador, botao) {
+    if (votos[jogador]) return;
 
-  const maisVotado = Object.keys(estado.votos).reduce((a, b) =>
-    estado.votos[a] > estado.votos[b] ? a : b
-  );
-
-  let texto = `O mais votado foi ${maisVotado} com ${estado.votos[maisVotado]} voto(s).\n`;
-  texto += maisVotado === estado.impostor
-    ? "O grupo venceu! 🎉"
-    : `O impostor (${estado.impostor}) venceu! 😈`;
-
-  document.getElementById("resultadoTexto").textContent = texto;
+    votos[jogador] = true;
+    botao.style.background = "#4CAF50";
+    botao.style.pointerEvents = "none";
 }
 
-/* REINICIAR */
-function reiniciar() {
-  trocarTela("resultado", "temaSelecao");
+function finalizarVotacao() {
+    let maisVotado = null;
+    let maiorQtde = 0;
+
+    const contagem = {};
+
+    for (let j in votos) {
+        contagem[j] = (contagem[j] || 0) + 1;
+        if (contagem[j] > maiorQtde) {
+            maiorQtde = contagem[j];
+            maisVotado = j;
+        }
+    }
+
+    const texto = document.getElementById("resultadoTexto");
+
+    if (Number(maisVotado) === impostor) {
+        texto.textContent = `O impostor era o Jogador ${impostor}. Vocês venceram!`;
+    } else {
+        texto.textContent = `O impostor era o Jogador ${impostor}. Ele enganou todo mundo.`;
+    }
+
+    mostrar("telaResultado");
 }
 
-function voltarMenu() {
-  document.getElementById("nomes").value = "";
-  trocarTela("resultado", "menu");
-}
 
+// -------------------------------
+// Reinício
+// -------------------------------
+function reiniciarJogo() {
+    mostrar("telaInicio");
+}
