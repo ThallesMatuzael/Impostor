@@ -1,64 +1,82 @@
 body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #0d1117, #1e293b);
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-  flex-direction: column;
-  text-align: center;
-  transition: background 0.5s ease, opacity 0.5s ease;
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #1b1b2f, #162447, #1f4068);
+    background-size: 300% 300%;
+    animation: fundo 12s ease infinite;
+    color: #fff;
+}
+
+@keyframes fundo {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.container {
+    max-width: 500px;
+    margin: 60px auto;
+    text-align: center;
+    transition: opacity 0.5s ease;
 }
 
 .hidden {
-  display: none;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    left: -9999px;
+}
+
+.titulo {
+    font-size: 2.3rem;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    animation: entrar 0.5s ease;
+}
+
+@keyframes entrar {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+input, select {
+    width: 90%;
+    padding: 10px;
+    margin: 8px 0 20px;
+    border: none;
+    border-radius: 10px;
+    outline: none;
 }
 
 button {
-  background: #22c55e;
-  border: none;
-  border-radius: 12px;
-  color: #fff;
-  padding: 12px 24px;
-  font-size: 1rem;
-  margin-top: 12px;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.3s;
+    padding: 12px 20px;
+    background: #e43f5a;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
 button:hover {
-  background: #16a34a;
-  transform: scale(1.05);
+    background: #ff4f70;
 }
 
-input, textarea, select {
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  width: 80%;
-  margin: 8px 0;
-  font-size: 1rem;
+.palavra-card {
+    font-size: 1.8rem;
+    padding: 30px;
 }
 
-textarea {
-  resize: none;
-  height: 100px;
-}
-
-/* Telas temáticas */
-.votacaoTela {
-  background: linear-gradient(135deg, #7f1d1d, #991b1b);
-}
-
-.transicaoTela {
-  background: linear-gradient(135deg, #1e3a8a, #312e81);
-}
-
-/* Botões bloqueados */
-.disabled {
-  background: #555 !important;
-  cursor: not-allowed !important;
-  transform: none !important;
+.votacao-card button {
+    display: block;
+    width: 100%;
+    margin: 8px auto;
 }
