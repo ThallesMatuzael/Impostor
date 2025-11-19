@@ -1,68 +1,57 @@
-<!DOCTYPE html>
+s<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ache o Impostor</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>Jogo do Impossível</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- MENU -->
-  <div id="menu">
-    <h1>Ache o Impostor 👀</h1>
-    <label>Quantidade de jogadores:</label>
-    <input type="number" id="qtd" min="3" max="15" value="5" />
+<div class="container" id="telaInicio">
+    <h1 class="titulo">Jogo do Impossível</h1>
 
-    <p>Insira os nomes (um por linha):</p>
-    <textarea id="nomes"></textarea>
+    <div class="card">
+        <label>Quantidade de jogadores:</label>
+        <input type="number" id="qtdJogadores" min="3" max="50" value="5">
 
-    <button onclick="gerarNomes()">Gerar nomes automáticos</button>
-    <button onclick="selecionarTema()">Continuar ➡️</button>
-  </div>
+        <label>Tema:</label>
+        <select id="temaSelect"></select>
 
-  <!-- TEMA -->
-  <div id="temaSelecao" class="hidden">
-    <h2>Escolha um tema:</h2>
-    <select id="temaEscolhido">
-      <option value="locais">Locais</option>
-      <option value="objetos">Objetos</option>
-      <option value="personagens">Personagens de Desenho</option>
-      <option value="profissoes">Profissões</option>
-      <option value="animais">Animais</option>
-    </select>
-    <button onclick="iniciarJogo()">Começar jogo 🚀</button>
-  </div>
+        <button onclick="iniciarJogo()">Iniciar</button>
+    </div>
+</div>
 
-  <!-- JOGO -->
-  <div id="jogo" class="hidden">
-    <h2 id="nomeAtual"></h2>
-    <p id="mensagem"></p>
-    <button onclick="confirmar()">Confirmar</button>
-  </div>
 
-  <!-- TRANSIÇÃO -->
-  <div id="transicao" class="hidden">
-    <h2>Todas as palavras foram reveladas!</h2>
-    <p>Agora o mestre deve iniciar a votação.</p>
-    <button onclick="iniciarVotacao()">Começar votação 🕵️‍♂️</button>
-  </div>
+<div class="container hidden" id="telaPalavra">
+    <h2 class="titulo">Sua Palavra</h2>
 
-  <!-- VOTAÇÃO -->
-  <div id="votacao" class="hidden">
-    <h2 id="votador"></h2>
-    <p>Vote em quem você acha que é o impostor:</p>
-    <div id="opcoesVoto"></div>
-  </div>
+    <div class="card palavra-card">
+        <p id="textoPalavra"></p>
+    </div>
 
-  <!-- RESULTADO -->
-  <div id="resultado" class="hidden">
-    <h2>Resultado 🕵️‍♂️</h2>
-    <p id="resultadoTexto"></p>
-    <button onclick="reiniciar()">Jogar novamente 🔁</button>
-    <button onclick="voltarMenu()">Voltar ao menu 🏠</button>
-  </div>
+    <button onclick="proximoJogador()">Próximo</button>
+</div>
 
-  <script src="script.js"></script>
+
+<div class="container hidden" id="telaVotacao">
+    <h2 class="titulo">Votação</h2>
+
+    <div id="votacaoArea" class="card votacao-card"></div>
+
+    <button onclick="finalizarVotacao()">Finalizar Votação</button>
+</div>
+
+
+<div class="container hidden" id="telaResultado">
+    <h2 class="titulo">Resultado</h2>
+
+    <div class="card">
+        <p id="resultadoTexto"></p>
+    </div>
+
+    <button onclick="reiniciarJogo()">Jogar Novamente</button>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
